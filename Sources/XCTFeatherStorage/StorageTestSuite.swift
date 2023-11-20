@@ -5,9 +5,27 @@
 //  Created by Tibor Bodecs on 17/11/2023.
 //
 
+import NIOCore
 import NIOFoundationCompat
 import Foundation
 import FeatherStorage
+
+extension Data {
+
+    static func random(length: Int) -> Data {
+        .init((0 ..< length).map { _ in
+            UInt8.random(in: UInt8.min...UInt8.max)
+        })
+    }
+}
+
+extension ByteBuffer {
+    
+    func getData() -> Data? {
+        getData(at: 0, length: readableBytes)
+    }
+}
+
 
 public struct StorageTestSuiteError: Error {
 
@@ -41,11 +59,12 @@ public struct StorageTestSuite {
             testList(),
             testExists(),
             testDownload(),
-            //            testDownloadRange(),
-            //            testDownloadRanges(),
+            testDownloadRange(),
+            testDownloadRanges(),
             testListFile(),
             testCopy(),
             testMove(),
+            testMultipart(),
         ]
         do {
             _ = try await tests
@@ -257,53 +276,52 @@ public extension StorageTestSuite {
             throw StorageTestSuiteError()
         }
     }
+    
+    func testMultipart() async throws {
+        
+        let chunkSize = 5 * 1024 * 1024                  // 5MB chunks
+        let data = Data.random(length: 12 * 1024 * 1024) // 12MB data
 
-    //    func testMultipartUpload() async throws {
-    //
-    //        let key = "test-04.txt"
-    //
-    //        let id = try await storage.createMultipartUpload(key: key)
-    //
-    //        let data1 = Data("lorem ipsum".utf8)
-    //        let chunk1 = try await storage.uploadMultipartChunk(
-    //            key: key,
-    //            buffer: .init(data: data1),
-    //            uploadId: id,
-    //            number: 1
-    //        )
-    //
-    //        let data2 = Data(" dolor sit amet".utf8)
-    //        let chunk2 = try await storage.uploadMultipartChunk(
-    //            key: key,
-    //            buffer: .init(data: data2),
-    //            uploadId: id,
-    //            number: 2
-    //        )
-    //
-    //        try await storage.completeMultipartUpload(
-    //            key: key,
-    //            uploadId: id,
-    //            checksum: nil,
-    //            chunks: [
-    //                chunk1,
-    //                chunk2,
-    //            ]
-    //        )
-    //
-    //        let file = try await storage.download(
-    //            key: key,
-    //            range: nil,
-    //            timeout: .seconds(30)
-    //        )
-    //
-    //        guard
-    //            let data = file.getData(at: 0, length: file.readableBytes),
-    //            let value = String(data: data, encoding: .utf8)
-    //        else {
-    //            return XCTFail("Missing or invalid file data.")
-    //        }
-    //
-    //        XCTAssertEqual(value, "lorem ipsum dolor sit amet")
-    //    }
+        let dataSize = data.count
+        var chunkCount = dataSize / chunkSize
+        let remaining = dataSize % chunkSize
+        if remaining > 0 {
+            chunkCount += 1
+        }
+
+        let key = "multipart-\(UUID().uuidString).data"
+        let multipartId = try await storage.createMultipartId(key: key)
+
+        var chunks: [StorageChunk] = []
+        for i in 0..<chunkCount {
+            let startIndex = i * chunkSize
+            var endIndex = startIndex + chunkSize
+            if i + 1 == chunkCount {
+                endIndex = startIndex + remaining
+            }
+            let chunkData = data[startIndex..<endIndex]
+            let chunk = try await storage.upload(
+                multipartId: multipartId,
+                key: key,
+                number: (i + 1),
+                buffer: .init(data: chunkData)
+            )
+            chunks.append(chunk)
+        }
+
+        try await storage.finish(
+            multipartId: multipartId,
+            key: key,
+            chunks: chunks
+        )
+        
+        let download = try await storage.download(key: key, range: nil)
+        guard let downloadData = download.getData() else {
+            throw StorageTestSuiteError()
+        }
+        guard downloadData == data else {
+            throw StorageTestSuiteError()
+        }
+    }
 
 }
