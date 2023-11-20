@@ -292,7 +292,7 @@ public extension StorageTestSuite {
         let key = "multipart-\(UUID().uuidString).data"
         let multipartId = try await storage.createMultipartId(key: key)
 
-        var chunks: [Multipart.Chunk] = []
+        var chunks: [StorageChunk] = []
         for i in 0..<chunkCount {
             let startIndex = i * chunkSize
             var endIndex = startIndex + chunkSize

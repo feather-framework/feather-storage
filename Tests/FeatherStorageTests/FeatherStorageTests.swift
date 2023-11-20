@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import XCTFeatherStorage
+import FeatherStorage
 
 final class FeatherStorageTests: XCTestCase {
 

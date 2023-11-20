@@ -8,19 +8,17 @@
 import FeatherService
 import NIOCore
 
-public enum Multipart {
+/// storage chunks returned used by the multipart request apis
+public struct StorageChunk: Hashable, Codable, Sendable, Equatable {
+    public let chunkId: String
+    public let number: Int
 
-    public struct Chunk: Hashable, Codable, Sendable, Equatable {
-        public let chunkId: String
-        public let number: Int
-
-        public init(
-            chunkId: String,
-            number: Int
-        ) {
-            self.chunkId = chunkId
-            self.number = number
-        }
+    public init(
+        chunkId: String,
+        number: Int
+    ) {
+        self.chunkId = chunkId
+        self.number = number
     }
 }
 
@@ -92,7 +90,7 @@ public protocol StorageService: Service {
         key: String,
         number: Int,
         buffer: ByteBuffer
-    ) async throws -> Multipart.Chunk
+    ) async throws -> StorageChunk
 
     /// abort a multipart upload
     func abort(
@@ -104,7 +102,7 @@ public protocol StorageService: Service {
     func finish(
         multipartId: String,
         key: String,
-        chunks: [Multipart.Chunk]
+        chunks: [StorageChunk]
     ) async throws
 }
 
