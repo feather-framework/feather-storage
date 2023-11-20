@@ -175,54 +175,72 @@ public extension StorageTestSuite {
     }
 
     func testDownloadRange() async throws {
+        let value = "test"
         let key2 = "dir04/test-01.txt"
-        let data = Data("test".utf8)
+        let data = Data(value.utf8)
         try await storage.upload(
             key: key2,
             buffer: .init(data: data)
         )
+        
+        let range = 1...3
+        let startIndex = value.index(value.startIndex, offsetBy: range.lowerBound)
+        let endIndex = value.index(value.startIndex, offsetBy: range.upperBound)
+        let exp = value[startIndex...endIndex]
 
         let res = try await storage.download(
             key: key2,
-            range: 1...3
+            range: range
         )
         guard
             let resData = res.getData(at: 0, length: res.readableBytes),
             let res = String(data: resData, encoding: .utf8),
-            res == "es"
+            res == exp
         else {
             throw StorageTestSuiteError()
         }
     }
 
     func testDownloadRanges() async throws {
+        let value = "test"
         let key2 = "dir04/test-01.txt"
-        let data = Data("test".utf8)
+        
+        let data = Data(value.utf8)
         try await storage.upload(
             key: key2,
             buffer: .init(data: data)
         )
 
+        let range1 = 0...2
+        let startIndex1 = value.index(value.startIndex, offsetBy: range1.lowerBound)
+        let endIndex1 = value.index(value.startIndex, offsetBy: range1.upperBound)
+        let exp1 = value[startIndex1...endIndex1]
+        
         let res1 = try await storage.download(
             key: key2,
-            range: 0...2
+            range: range1
         )
         guard
             let resData = res1.getData(at: 0, length: res1.readableBytes),
             let res1 = String(data: resData, encoding: .utf8),
-            res1 == "te"
+            res1 == exp1
         else {
             throw StorageTestSuiteError()
         }
 
+        let range2 = 2...3
+        let startIndex2 = value.index(value.startIndex, offsetBy: range2.lowerBound)
+        let endIndex2 = value.index(value.startIndex, offsetBy: range2.upperBound)
+        let exp2 = value[startIndex2...endIndex2]
+        
         let res2 = try await storage.download(
             key: key2,
-            range: 2...4
+            range: range2
         )
         guard
             let resData = res2.getData(at: 0, length: res2.readableBytes),
             let res2 = String(data: resData, encoding: .utf8),
-            res2 == "st"
+            res2 == exp2
         else {
             throw StorageTestSuiteError()
         }

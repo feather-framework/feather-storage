@@ -37,7 +37,7 @@ public protocol StorageService: Service {
     /// download a given object data using a key
     func download(
         key: String,
-        range: ClosedRange<UInt>?
+        range: ClosedRange<Int>?
     ) async throws -> ByteBuffer
 
     /// check if a given key exists
