@@ -12,10 +12,10 @@ public enum StorageServiceID: ServiceID {
 
     /// default storage service identifier
     case `default`
-    
+
     /// custom storage service identifier
     case custom(String)
-    
+
     public var rawId: String {
         switch self {
         case .default:
@@ -29,11 +29,11 @@ public enum StorageServiceID: ServiceID {
 public extension ServiceRegistry {
 
     /// add a new storage service using a context
-    func add(
-        _ contextFactoryBuilder: @autoclosure @escaping () -> ServiceContext,
+    func addStorage(
+        _ context: ServiceContext,
         id: StorageServiceID = .default
     ) async throws {
-        try await add(.init { contextFactoryBuilder() }, id: id)
+        try await add(context, id: id)
     }
 
     /// returns a storage service by a given id
@@ -41,7 +41,8 @@ public extension ServiceRegistry {
         _ id: StorageServiceID = .default,
         logger: Logger? = nil
     ) throws -> StorageService {
-        guard let storage = try get(id, logger: logger) as? StorageService else {
+        guard let storage = try get(id, logger: logger) as? StorageService
+        else {
             fatalError("Storage service not found, use `add` to register.")
         }
         return storage
