@@ -13,19 +13,21 @@ import FeatherStorage
 extension Data {
 
     static func random(length: Int) -> Data {
-        .init((0 ..< length).map { _ in
-            UInt8.random(in: UInt8.min...UInt8.max)
-        })
+        .init(
+            (0..<length)
+                .map { _ in
+                    UInt8.random(in: UInt8.min...UInt8.max)
+                }
+        )
     }
 }
 
 extension ByteBuffer {
-    
+
     func getData() -> Data? {
         getData(at: 0, length: readableBytes)
     }
 }
-
 
 public struct StorageTestSuiteError: Error {
 
@@ -182,9 +184,12 @@ public extension StorageTestSuite {
             key: key2,
             buffer: .init(data: data)
         )
-        
+
         let range = 1...3
-        let startIndex = value.index(value.startIndex, offsetBy: range.lowerBound)
+        let startIndex = value.index(
+            value.startIndex,
+            offsetBy: range.lowerBound
+        )
         let endIndex = value.index(value.startIndex, offsetBy: range.upperBound)
         let exp = value[startIndex...endIndex]
 
@@ -204,7 +209,7 @@ public extension StorageTestSuite {
     func testDownloadRanges() async throws {
         let value = "test"
         let key2 = "dir04/test-01.txt"
-        
+
         let data = Data(value.utf8)
         try await storage.upload(
             key: key2,
@@ -212,10 +217,16 @@ public extension StorageTestSuite {
         )
 
         let range1 = 0...2
-        let startIndex1 = value.index(value.startIndex, offsetBy: range1.lowerBound)
-        let endIndex1 = value.index(value.startIndex, offsetBy: range1.upperBound)
+        let startIndex1 = value.index(
+            value.startIndex,
+            offsetBy: range1.lowerBound
+        )
+        let endIndex1 = value.index(
+            value.startIndex,
+            offsetBy: range1.upperBound
+        )
         let exp1 = value[startIndex1...endIndex1]
-        
+
         let res1 = try await storage.download(
             key: key2,
             range: range1
@@ -229,10 +240,16 @@ public extension StorageTestSuite {
         }
 
         let range2 = 2...3
-        let startIndex2 = value.index(value.startIndex, offsetBy: range2.lowerBound)
-        let endIndex2 = value.index(value.startIndex, offsetBy: range2.upperBound)
+        let startIndex2 = value.index(
+            value.startIndex,
+            offsetBy: range2.lowerBound
+        )
+        let endIndex2 = value.index(
+            value.startIndex,
+            offsetBy: range2.upperBound
+        )
         let exp2 = value[startIndex2...endIndex2]
-        
+
         let res2 = try await storage.download(
             key: key2,
             range: range2
@@ -294,11 +311,11 @@ public extension StorageTestSuite {
             throw StorageTestSuiteError()
         }
     }
-    
+
     func testMultipart() async throws {
-        
-        let chunkSize = 5 * 1024 * 1024                  // 5MB chunks
-        let data = Data.random(length: 12 * 1024 * 1024) // 12MB data
+
+        let chunkSize = 5 * 1024 * 1024  // 5MB chunks
+        let data = Data.random(length: 12 * 1024 * 1024)  // 12MB data
 
         let dataSize = data.count
         var chunkCount = dataSize / chunkSize
@@ -332,7 +349,7 @@ public extension StorageTestSuite {
             key: key,
             chunks: chunks
         )
-        
+
         let download = try await storage.download(key: key, range: nil)
         guard let downloadData = download.getData() else {
             throw StorageTestSuiteError()

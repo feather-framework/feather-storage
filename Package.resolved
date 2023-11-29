@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/feather-framework/feather-service.git",
       "state" : {
-        "revision" : "7e8c2c18fa353fadb1e546fb11cb0e8a7c0ddc04",
-        "version" : "0.2.0"
+        "revision" : "9834b3fe842b7228c66c08d0d23ec5dd7fc693cd",
+        "version" : "0.3.0"
       }
     },
     {
