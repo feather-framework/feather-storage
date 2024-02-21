@@ -1,11 +1,11 @@
 //
-//  StorageService.swift
+//  StorageComponent.swift
 //  FeatherStorage
 //
 //  Created by Tibor Bodecs on 2020. 04. 28..
 //
 
-import FeatherService
+import FeatherComponent
 import NIOCore
 
 /// storage chunks returned used by the multipart request apis
@@ -22,8 +22,8 @@ public struct StorageChunk: Hashable, Codable, Sendable, Equatable {
     }
 }
 
-/// storage service protocol
-public protocol StorageService: Service {
+/// storage component protocol
+public protocol StorageComponent: Component {
 
     /// returns the available storage space
     var availableSpace: UInt64 { get }
@@ -106,7 +106,7 @@ public protocol StorageService: Service {
     ) async throws
 }
 
-extension StorageService {
+extension StorageComponent {
 
     public func move(
         key source: String,
@@ -114,7 +114,7 @@ extension StorageService {
     ) async throws {
         let exists = await exists(key: source)
         guard exists else {
-            throw StorageServiceError.invalidKey
+            throw StorageComponentError.invalidKey
         }
         try await copy(key: source, to: destination)
         try await delete(key: source)

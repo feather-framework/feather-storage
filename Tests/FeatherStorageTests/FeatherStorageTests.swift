@@ -6,16 +6,16 @@
 //
 
 import XCTest
-import FeatherService
+import FeatherComponent
 import FeatherStorage
 
 final class FeatherStorageTests: XCTestCase {
 
     func testExample() async throws {
 
-        let registry = ServiceRegistry()
+        let registry = ComponentRegistry()
 
-        try await registry.addStorage(MyStorageServiceContext())
+        try await registry.addStorage(MyStorageComponentContext())
         try await registry.run()
 
         let storage = try await registry.storage()

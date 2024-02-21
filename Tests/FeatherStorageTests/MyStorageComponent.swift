@@ -1,17 +1,17 @@
 //
-//  MyStorageService.swift
+//  MyStorageComponent.swift
 //  FeatherStorageTests
 //
 //  Created by Tibor Bödecs on 29/11/2023.
 //
 
-import FeatherService
+import FeatherComponent
 import FeatherStorage
 import NIOCore
 
-struct MyStorageService: StorageService {
+struct MyStorageComponent: StorageComponent {
 
-    var config: ServiceConfig
+    var config: ComponentConfig
     var availableSpace: UInt64
 
     func upload(key: String, buffer: ByteBuffer) async throws {
