@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  StorageTestSuite.swift
 //  XCTFeatherStorage
 //
 //  Created by Tibor Bodecs on 17/11/2023.
@@ -48,9 +48,9 @@ public struct StorageTestSuiteError: Error {
 
 public struct StorageTestSuite {
 
-    let storage: StorageService
+    let storage: StorageComponent
 
-    public init(_ storage: StorageService) {
+    public init(_ storage: StorageComponent) {
         self.storage = storage
     }
 
