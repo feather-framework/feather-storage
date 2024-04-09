@@ -21,8 +21,7 @@ struct MyStorageComponent: StorageComponent {
     func download(
         key: String,
         range: ClosedRange<Int>?
-    ) async throws -> ByteBuffer
-    {
+    ) async throws -> ByteBuffer {
         fatalError()
     }
 
@@ -74,5 +73,4 @@ struct MyStorageComponent: StorageComponent {
     ) async throws {
         fatalError()
     }
-
 }

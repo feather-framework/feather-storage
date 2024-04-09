@@ -9,7 +9,7 @@ import FeatherComponent
 
 struct MyStorageComponentContext: ComponentContext {
 
-    func make() throws -> ComponentBuilder {
-        MyStorageComponentBuilder()
+    func make() throws -> ComponentFactory {
+        MyStorageComponentFactory()
     }
 }
