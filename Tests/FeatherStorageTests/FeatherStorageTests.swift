@@ -16,11 +16,8 @@ final class FeatherStorageTests: XCTestCase {
         let registry = ComponentRegistry()
 
         try await registry.addStorage(MyStorageComponentContext())
-        try await registry.run()
 
         let storage = try await registry.storage()
         XCTAssertNotNil(storage)
-
-        try await registry.shutdown()
     }
 }

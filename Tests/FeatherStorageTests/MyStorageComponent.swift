@@ -74,5 +74,4 @@ struct MyStorageComponent: StorageComponent {
     ) async throws {
         fatalError()
     }
-
 }

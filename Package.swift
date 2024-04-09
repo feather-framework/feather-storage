@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.0.0"),
-        .package(url: "https://github.com/feather-framework/feather-component", .upToNextMinor(from: "0.4.0")),
+        .package(url: "https://github.com/feather-framework/feather-component", .upToNextMinor(from: "0.5.0")),
     ],
     targets: [
         .target(
