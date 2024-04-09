@@ -5,10 +5,10 @@
 //  Created by Tibor Bodecs on 17/11/2023.
 //
 
+import FeatherStorage
+import Foundation
 import NIOCore
 import NIOFoundationCompat
-import Foundation
-import FeatherStorage
 
 extension Data {
 
@@ -80,17 +80,17 @@ public struct StorageTestSuite {
     }
 }
 
-public extension StorageTestSuite {
+extension StorageTestSuite {
 
     // MARK: - tests
 
-    func testUpload() async throws {
+    public func testUpload() async throws {
         let key = "test-case-01.txt"
         let data = Data("Lorem ipsum dolor sit amet".utf8)
         try await storage.upload(key: key, buffer: .init(data: data))
     }
 
-    func testCreate() async throws {
+    public func testCreate() async throws {
         let key = "dir01/dir02/dir03"
         try await storage.create(key: key)
 
@@ -105,7 +105,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testList() async throws {
+    public func testList() async throws {
         let key1 = "dir02/dir03"
         try await storage.create(key: key1)
 
@@ -122,7 +122,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testExists() async throws {
+    public func testExists() async throws {
         /// file tests
 
         let key1 = "non-existing-thing"
@@ -156,7 +156,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testDownload() async throws {
+    public func testDownload() async throws {
         let key2 = "dir04/test-01.txt"
         let data = Data("test".utf8)
         try await storage.upload(
@@ -176,7 +176,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testDownloadRange() async throws {
+    public func testDownloadRange() async throws {
         let value = "test"
         let key2 = "dir04/test-01.txt"
         let data = Data(value.utf8)
@@ -206,7 +206,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testDownloadRanges() async throws {
+    public func testDownloadRanges() async throws {
         let value = "test"
         let key2 = "dir04/test-01.txt"
 
@@ -263,7 +263,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testListFile() async throws {
+    public func testListFile() async throws {
         let key2 = "dir04/test-01.txt"
         let data = Data("test".utf8)
         try await storage.upload(
@@ -276,7 +276,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testCopy() async throws {
+    public func testCopy() async throws {
         let key = "test-02.txt"
         let data = Data("file storage test 02".utf8)
         try await storage.upload(
@@ -294,7 +294,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testMove() async throws {
+    public func testMove() async throws {
         let key = "test-04.txt"
         let data = Data("file storage test 04".utf8)
         try await storage.upload(
@@ -312,7 +312,7 @@ public extension StorageTestSuite {
         }
     }
 
-    func testMultipart() async throws {
+    public func testMultipart() async throws {
 
         let chunkSize = 5 * 1024 * 1024  // 5MB chunks
         let data = Data.random(length: 12 * 1024 * 1024)  // 12MB data

@@ -26,10 +26,10 @@ public enum StorageComponentID: ComponentID {
     }
 }
 
-public extension ComponentRegistry {
+extension ComponentRegistry {
 
     /// add a new storage component using a context
-    func addStorage(
+    public func addStorage(
         _ context: ComponentContext,
         id: StorageComponentID = .default
     ) async throws {
@@ -37,14 +37,16 @@ public extension ComponentRegistry {
     }
 
     /// returns a storage component by a given id
-    func storage(
+    public func storage(
         _ id: StorageComponentID = .default,
         logger: Logger? = nil
     ) throws -> StorageComponent {
-        guard 
+        guard
             let storage = try get(id, logger: logger) as? StorageComponent
         else {
-            fatalError("Storage component not found, call `addStorage()` to register.")
+            fatalError(
+                "Storage component not found, call `addStorage()` to register."
+            )
         }
         return storage
     }
