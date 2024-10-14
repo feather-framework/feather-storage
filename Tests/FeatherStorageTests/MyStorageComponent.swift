@@ -18,10 +18,23 @@ struct MyStorageComponent: StorageComponent {
         fatalError()
     }
 
+    func uploadStream(
+        key: String,
+        sequence: FeatherStorage.StorageAnyAsyncSequence<NIOCore.ByteBuffer>
+    ) async throws {
+        fatalError()
+    }
+
     func download(
         key: String,
         range: ClosedRange<Int>?
     ) async throws -> ByteBuffer {
+        fatalError()
+    }
+
+    func downloadStream(key: String, range: ClosedRange<Int>?) async throws
+        -> FeatherStorage.StorageAnyAsyncSequence<NIOCore.ByteBuffer>
+    {
         fatalError()
     }
 
@@ -59,6 +72,15 @@ struct MyStorageComponent: StorageComponent {
         number: Int,
         buffer: ByteBuffer
     ) async throws -> StorageChunk {
+        fatalError()
+    }
+
+    func uploadStream(
+        multipartId: String,
+        key: String,
+        number: Int,
+        sequence: FeatherStorage.StorageAnyAsyncSequence<NIOCore.ByteBuffer>
+    ) async throws -> FeatherStorage.StorageChunk {
         fatalError()
     }
 
