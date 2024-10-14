@@ -217,6 +217,25 @@ public protocol StorageComponent: Component {
     ) async throws
 }
 
+struct ByteBufferAsyncSequenceWrapper: AsyncSequence {
+    typealias Element = ByteBuffer
+    let buffer: ByteBuffer
+
+    struct AsyncIterator: AsyncIteratorProtocol {
+        var buffer: ByteBuffer?
+
+        mutating func next() async -> ByteBuffer? {
+            let ret = buffer
+            buffer = nil
+            return ret
+        }
+    }
+
+    func makeAsyncIterator() -> AsyncIterator {
+        AsyncIterator(buffer: (buffer.readableBytes > 0 ? buffer : nil))
+    }
+}
+
 extension StorageComponent {
 
     public func move(
@@ -229,5 +248,42 @@ extension StorageComponent {
         }
         try await copy(key: source, to: destination)
         try await delete(key: source)
+    }
+
+    public func upload(
+        key: String,
+        buffer: ByteBuffer
+    ) async throws {
+        try await uploadStream(
+            key: key,
+            sequence: .init(
+                asyncSequence: ByteBufferAsyncSequenceWrapper(buffer: buffer),
+                length: UInt64(buffer.readableBytes)
+            )
+        )
+    }
+
+    public func download(
+        key: String,
+        range: ClosedRange<Int>?
+    ) async throws -> ByteBuffer {
+        try await downloadStream(key: key, range: range).collect(upTo: Int.max)
+    }
+
+    public func upload(
+        multipartId: String,
+        key: String,
+        number: Int,
+        buffer: ByteBuffer
+    ) async throws -> StorageChunk {
+        try await uploadStream(
+            multipartId: multipartId,
+            key: key,
+            number: number,
+            sequence: .init(
+                asyncSequence: ByteBufferAsyncSequenceWrapper(buffer: buffer),
+                length: UInt64(buffer.readableBytes)
+            )
+        )
     }
 }
