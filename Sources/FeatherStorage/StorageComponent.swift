@@ -217,7 +217,7 @@ public protocol StorageComponent: Component {
     ) async throws
 }
 
-public struct StorageByteBufferAsyncSequenceWrapper: AsyncSequence {
+public struct StorageByteBufferAsyncSequenceWrapper: Sendable, AsyncSequence {
     public typealias Element = ByteBuffer
     let buffer: ByteBuffer
 
