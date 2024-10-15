@@ -217,21 +217,21 @@ public protocol StorageComponent: Component {
     ) async throws
 }
 
-struct ByteBufferAsyncSequenceWrapper: AsyncSequence {
-    typealias Element = ByteBuffer
+public struct StorageByteBufferAsyncSequenceWrapper: AsyncSequence {
+    public typealias Element = ByteBuffer
     let buffer: ByteBuffer
 
-    struct AsyncIterator: AsyncIteratorProtocol {
+    public struct AsyncIterator: AsyncIteratorProtocol {
         var buffer: ByteBuffer?
 
-        mutating func next() async -> ByteBuffer? {
+        public mutating func next() async -> ByteBuffer? {
             let ret = buffer
             buffer = nil
             return ret
         }
     }
 
-    func makeAsyncIterator() -> AsyncIterator {
+    public func makeAsyncIterator() -> AsyncIterator {
         AsyncIterator(buffer: (buffer.readableBytes > 0 ? buffer : nil))
     }
 }
@@ -257,7 +257,9 @@ extension StorageComponent {
         try await uploadStream(
             key: key,
             sequence: .init(
-                asyncSequence: ByteBufferAsyncSequenceWrapper(buffer: buffer),
+                asyncSequence: StorageByteBufferAsyncSequenceWrapper(
+                    buffer: buffer
+                ),
                 length: UInt64(buffer.readableBytes)
             )
         )
@@ -281,7 +283,9 @@ extension StorageComponent {
             key: key,
             number: number,
             sequence: .init(
-                asyncSequence: ByteBufferAsyncSequenceWrapper(buffer: buffer),
+                asyncSequence: StorageByteBufferAsyncSequenceWrapper(
+                    buffer: buffer
+                ),
                 length: UInt64(buffer.readableBytes)
             )
         )
