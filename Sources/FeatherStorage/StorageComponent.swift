@@ -221,6 +221,10 @@ public struct StorageByteBufferAsyncSequenceWrapper: AsyncSequence {
     public typealias Element = ByteBuffer
     let buffer: ByteBuffer
 
+    public init(buffer: ByteBuffer) {
+        self.buffer = buffer
+    }
+
     public struct AsyncIterator: AsyncIteratorProtocol {
         var buffer: ByteBuffer?
 
