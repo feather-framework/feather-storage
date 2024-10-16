@@ -94,12 +94,12 @@ extension StorageTestSuite {
         let key = "dir01/dir02/dir03"
         try await storage.create(key: key)
 
-        let keys1 = try await storage.list(key: "dir01")
+        let keys1 = try await storage.list(key: "dir01").sorted()
         guard keys1 == ["dir02"] else {
             throw StorageTestSuiteError()
         }
 
-        let keys2 = try await storage.list(key: "dir01/dir02")
+        let keys2 = try await storage.list(key: "dir01/dir02").sorted()
         guard keys2 == ["dir03"] else {
             throw StorageTestSuiteError()
         }
@@ -116,7 +116,7 @@ extension StorageTestSuite {
             buffer: .init(data: data)
         )
 
-        let res = try await storage.list(key: "dir02")
+        let res = try await storage.list(key: "dir02").sorted()
         guard res == ["dir03", "test-01.txt"] else {
             throw StorageTestSuiteError()
         }
@@ -270,7 +270,7 @@ extension StorageTestSuite {
             key: key2,
             buffer: .init(data: data)
         )
-        let res = try await storage.list(key: key2)
+        let res = try await storage.list(key: key2).sorted()
         guard res.isEmpty else {
             throw StorageTestSuiteError()
         }
