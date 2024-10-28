@@ -217,21 +217,56 @@ public protocol StorageComponent: Component {
     ) async throws
 }
 
+//public struct StorageByteBufferAsyncSequenceWrapper: Sendable, AsyncSequence {
+//    public typealias Element = ByteBuffer
+//    let buffer: ByteBuffer
+//
+//    public init(buffer: ByteBuffer) {
+//        self.buffer = buffer
+//    }
+//
+//    public struct AsyncIterator: AsyncIteratorProtocol {
+//        var buffer: ByteBuffer?
+//
+//        public mutating func next() async -> ByteBuffer? {
+//            let ret = buffer
+//            buffer = nil
+//            return ret
+//        }
+//    }
+//
+//    public func makeAsyncIterator() -> AsyncIterator {
+//        AsyncIterator(buffer: (buffer.readableBytes > 0 ? buffer : nil))
+//    }
+//}
+
 public struct StorageByteBufferAsyncSequenceWrapper: Sendable, AsyncSequence {
     public typealias Element = ByteBuffer
     let buffer: ByteBuffer
-
+    
     public init(buffer: ByteBuffer) {
         self.buffer = buffer
     }
 
     public struct AsyncIterator: AsyncIteratorProtocol {
-        var buffer: ByteBuffer?
+        let buffer: ByteBuffer?
+        var currentIndex: Int = 0
 
         public mutating func next() async -> ByteBuffer? {
-            let ret = buffer
-            buffer = nil
-            return ret
+            guard let buffer = buffer, currentIndex < buffer.readableBytes
+            else {
+                return nil
+            }
+            
+            let endIndex = Swift.min(currentIndex + 32 * 1024, buffer.readableBytes)
+            let chunkRange = currentIndex..<endIndex
+            
+            var chunk = buffer
+            chunk.moveReaderIndex(to: chunkRange.lowerBound)
+            chunk.moveWriterIndex(to: chunkRange.upperBound)
+            
+            currentIndex = endIndex
+            return chunk
         }
     }
 
