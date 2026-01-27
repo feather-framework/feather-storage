@@ -5,13 +5,11 @@
 //  Created by Tibor Bödecs on 29/11/2023.
 //
 
-import FeatherComponent
 import FeatherStorage
 import NIOCore
 
 struct MyStorageComponent: StorageComponent {
 
-    var config: ComponentConfig
     var availableSpace: UInt64
 
     func upload(key: String, buffer: ByteBuffer) async throws {

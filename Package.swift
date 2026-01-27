@@ -1,5 +1,25 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.1
 import PackageDescription
+
+// NOTE: https://github.com/swift-server/swift-http-server/blob/main/Package.swift
+var defaultSwiftSettings: [SwiftSetting] =
+[
+    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0441-formalize-language-mode-terminology.md
+    .swiftLanguageMode(.v6),
+    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0444-member-import-visibility.md
+    .enableUpcomingFeature("MemberImportVisibility"),
+    // https://forums.swift.org/t/experimental-support-for-lifetime-dependencies-in-swift-6-2-and-beyond/78638
+    .enableExperimentalFeature("Lifetimes"),
+    // https://github.com/swiftlang/swift/pull/65218
+    .enableExperimentalFeature("AvailabilityMacro=featherStorage 1.0:macOS 15.0, iOS 18.0, tvOS 18.0, watchOS 11.0, visionOS 2.0"),
+]
+
+#if compiler(>=6.2)
+defaultSwiftSettings.append(
+    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0461-async-function-isolation.md
+    .enableUpcomingFeature("NonisolatedNonsendingByDefault")
+)
+#endif
 
 let package = Package(
     name: "feather-storage",
@@ -12,38 +32,26 @@ let package = Package(
     ],
     products: [
         .library(name: "FeatherStorage", targets: ["FeatherStorage"]),
-        .library(name: "XCTFeatherStorage", targets: ["XCTFeatherStorage"]),
+        // [docc-plugin-placeholder]
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.0.0"),
-        .package(url: "https://github.com/feather-framework/feather-component", .upToNextMinor(from: "0.5.0")),
     ],
     targets: [
         .target(
             name: "FeatherStorage",
             dependencies: [
                 .product(name: "NIOCore", package: "swift-nio"),
-                .product(name: "FeatherComponent", package: "feather-component")
-            ]
-        ),
-        .target(
-            name: "XCTFeatherStorage",
-            dependencies: [
-                .product(name: "NIOFoundationCompat", package: "swift-nio"),
-                .target(name: "FeatherStorage"),
-            ]
+            ],
+            swiftSettings: defaultSwiftSettings
         ),
         .testTarget(
             name: "FeatherStorageTests",
             dependencies: [
                 .target(name: "FeatherStorage"),
-            ]
-        ),
-        .testTarget(
-            name: "XCTFeatherStorageTests",
-            dependencies: [
-                .target(name: "XCTFeatherStorage"),
-            ]
+                .product(name: "NIOFoundationCompat", package: "swift-nio"),
+            ],
+            swiftSettings: defaultSwiftSettings
         ),
     ]
 )
