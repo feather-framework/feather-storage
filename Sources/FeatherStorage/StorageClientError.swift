@@ -1,12 +1,12 @@
 //
-//  StorageComponentError.swift
+//  StorageError.swift
 //  FeatherStorage
 //
 //  Created by Tibor Bodecs on 2023. 01. 16..
 //
 
 /// storage component error
-public enum StorageComponentError: Error {
+public enum StorageClientError: Error {
 
     case invalidKey
 

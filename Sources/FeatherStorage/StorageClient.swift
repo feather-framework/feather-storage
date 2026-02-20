@@ -8,7 +8,7 @@
 import NIOCore
 
 /// storage component protocol
-public protocol StorageComponent {
+public protocol StorageClient {
 
     /// returns the available storage space
     var availableSpace: UInt64 { get }
@@ -87,7 +87,7 @@ public protocol StorageComponent {
         key: String,
         number: Int,
         buffer: ByteBuffer
-    ) async throws -> StorageChunk
+    ) async throws -> Chunk
 
     /// upload a multipart chunk via async sequence
     func uploadStream(
@@ -95,7 +95,7 @@ public protocol StorageComponent {
         key: String,
         number: Int,
         sequence: StorageAnyAsyncSequence<ByteBuffer>
-    ) async throws -> StorageChunk
+    ) async throws -> Chunk
 
     /// abort a multipart upload
     func abort(
@@ -107,8 +107,65 @@ public protocol StorageComponent {
     func finish(
         multipartId: String,
         key: String,
-        chunks: [StorageChunk]
+        chunks: [Chunk]
     ) async throws
 }
 
 
+// MARK: - default implementations
+
+extension StorageClient {
+
+    public func move(
+        key source: String,
+        to destination: String
+    ) async throws {
+        let exists = await exists(key: source)
+        guard exists else {
+            throw StorageClientError.invalidKey
+        }
+        try await copy(key: source, to: destination)
+        try await delete(key: source)
+    }
+
+    public func upload(
+        key: String,
+        buffer: ByteBuffer
+    ) async throws {
+        try await uploadStream(
+            key: key,
+            sequence: .init(
+                asyncSequence: ByteBufferSequence(
+                    buffer: buffer
+                ),
+                length: UInt64(buffer.readableBytes)
+            )
+        )
+    }
+
+    public func download(
+        key: String,
+        range: ClosedRange<Int>?
+    ) async throws -> ByteBuffer {
+        try await downloadStream(key: key, range: range).collect(upTo: Int.max)
+    }
+
+    public func upload(
+        multipartId: String,
+        key: String,
+        number: Int,
+        buffer: ByteBuffer
+    ) async throws -> Chunk {
+        try await uploadStream(
+            multipartId: multipartId,
+            key: key,
+            number: number,
+            sequence: .init(
+                asyncSequence: ByteBufferSequence(
+                    buffer: buffer
+                ),
+                length: UInt64(buffer.readableBytes)
+            )
+        )
+    }
+}

@@ -6,15 +6,15 @@
 //
 
 /// storage chunks returned used by the multipart request apis
-public struct StorageChunk: Hashable, Codable, Sendable, Equatable {
-    public let chunkId: String
-    public let number: Int
+public struct Chunk: Hashable, Codable, Sendable, Equatable {
+    public var id: String
+    public var number: Int
 
     public init(
         chunkId: String,
         number: Int
     ) {
-        self.chunkId = chunkId
+        self.id = chunkId
         self.number = number
     }
 }

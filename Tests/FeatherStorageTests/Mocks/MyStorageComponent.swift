@@ -69,7 +69,7 @@ struct MyStorageComponent: StorageComponent {
         key: String,
         number: Int,
         buffer: ByteBuffer
-    ) async throws -> StorageChunk {
+    ) async throws -> Chunk {
         fatalError()
     }
 
@@ -78,7 +78,7 @@ struct MyStorageComponent: StorageComponent {
         key: String,
         number: Int,
         sequence: FeatherStorage.StorageAnyAsyncSequence<NIOCore.ByteBuffer>
-    ) async throws -> FeatherStorage.StorageChunk {
+    ) async throws -> FeatherStorage.Chunk {
         fatalError()
     }
 
@@ -89,7 +89,7 @@ struct MyStorageComponent: StorageComponent {
     func finish(
         multipartId: String,
         key: String,
-        chunks: [StorageChunk]
+        chunks: [Chunk]
     ) async throws {
         fatalError()
     }
