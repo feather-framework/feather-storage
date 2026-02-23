@@ -35,7 +35,7 @@ Abstract storage component, providing a shared API surface for file storage driv
 Use Swift Package Manager; add the dependency to your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/feather-framework/feather-storage", exact: "1.0.0-beta.1"),
+.package(url: "https://github.com/feather-framework/feather-storage", exact: "1.0.0-beta.2"),
 ```
 
 Then add `FeatherStorage` to your target dependencies:
