@@ -83,6 +83,24 @@ public struct StorageSequence: Sendable, AsyncSequence {
             }
         }
     }
+    
+    /// Creates a type-erased storage sequence from a byte buffer.
+    ///
+    /// - Parameters:
+    ///   - buffer: The underlying byte buffer.
+    ///   - chunkSize: The maximum number of bytes emitted per iteration.
+    public init(
+        buffer: ByteBuffer,
+        chunkSize: Int = 32 * 1024
+    ) {
+        self.init(
+            asyncSequence: ByteBufferSequence(
+                buffer: buffer,
+                chunkSize: chunkSize
+            ),
+            length: UInt64(buffer.readableBytes)
+        )
+    }
 
     /// Creates an async iterator for consuming the storage sequence.
     ///

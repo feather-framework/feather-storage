@@ -3,9 +3,9 @@
 Abstract storage component, providing a shared API surface for file storage drivers written in Swift.
 
 [
-    ![Release: 1.0.0-beta.1](https://img.shields.io/badge/Release-1%2E0%2E0--beta%2E1-F05138)
+    ![Release: 1.0.0-beta.2](https://img.shields.io/badge/Release-1%2E0%2E0--beta%2E2-F05138)
 ](
-    https://github.com/feather-framework/feather-storage/releases/tag/1.0.0-beta.1
+    https://github.com/feather-framework/feather-storage/releases/tag/1.0.0-beta.2
 )
 
 ## Features
