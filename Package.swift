@@ -24,18 +24,18 @@ defaultSwiftSettings.append(
 let package = Package(
     name: "feather-storage",
     platforms: [
-        .macOS(.v13),
-        .iOS(.v16),
-        .tvOS(.v16),
-        .watchOS(.v9),
-        .visionOS(.v1),
+        .macOS(.v15),
+        .iOS(.v18),
+        .tvOS(.v18),
+        .watchOS(.v11),
+        .visionOS(.v2),
     ],
     products: [
         .library(name: "FeatherStorage", targets: ["FeatherStorage"]),
         // [docc-plugin-placeholder]
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-nio", from: "2.0.0"),
+        .package(url: "https://github.com/apple/swift-nio", from: "2.9.0"),
     ],
     targets: [
         .target(
