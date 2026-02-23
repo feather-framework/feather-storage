@@ -21,7 +21,9 @@ struct StorageSequenceTestSuite {
         let allocator = ByteBufferAllocator()
         let sequence = StorageSequence(
             asyncSequence: AsyncStream { continuation in
-                continuation.yield(Self.makeBuffer([1, 2], allocator: allocator))
+                continuation.yield(
+                    Self.makeBuffer([1, 2], allocator: allocator)
+                )
                 continuation.yield(Self.makeBuffer([3], allocator: allocator))
                 continuation.finish()
             },
@@ -41,9 +43,11 @@ struct StorageSequenceTestSuite {
 
     @Test
     func initFromAsyncSequenceUsesNilLengthByDefault() {
-        let sequence = StorageSequence(asyncSequence: AsyncStream<ByteBuffer> { continuation in
-            continuation.finish()
-        })
+        let sequence = StorageSequence(
+            asyncSequence: AsyncStream<ByteBuffer> { continuation in
+                continuation.finish()
+            }
+        )
 
         #expect(sequence.length == nil)
     }
@@ -67,10 +71,13 @@ struct StorageSequenceTestSuite {
     @Test
     func initFromThrowingSequencePropagatesErrors() async {
         let allocator = ByteBufferAllocator()
-        let sequence = StorageSequence(asyncSequence: AsyncThrowingStream<ByteBuffer, Error> { continuation in
-            continuation.yield(Self.makeBuffer([1], allocator: allocator))
-            continuation.finish(throwing: TestError.failed)
-        })
+        let sequence = StorageSequence(
+            asyncSequence: AsyncThrowingStream<ByteBuffer, Error> {
+                continuation in
+                continuation.yield(Self.makeBuffer([1], allocator: allocator))
+                continuation.finish(throwing: TestError.failed)
+            }
+        )
 
         var iterator = sequence.makeAsyncIterator()
         do {

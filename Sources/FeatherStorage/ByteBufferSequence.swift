@@ -1,6 +1,6 @@
 //
 //  ByteBufferSequence.swift
-//  feather-storage-ephemeral
+//  feather-storage
 //
 //  Created by Tibor Bödecs on 2023. 01. 16.
 

@@ -83,7 +83,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
             }
         }
     }
-    
+
     /// Creates a type-erased storage sequence from a byte buffer.
     ///
     /// - Parameters:
