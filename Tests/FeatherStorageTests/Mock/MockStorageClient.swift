@@ -1,12 +1,12 @@
 //
-//  File.swift
+//  MockStorageClient.swift
 //  feather-storage
 //
 //  Created by Tibor Bödecs on 2026. 02. 23..
 //
 
-import NIOCore
 import FeatherStorage
+import NIOCore
 
 extension Array where Element: Sendable {
     var async: AsyncStream<Element> {
@@ -33,7 +33,6 @@ extension Array where Element == Int {
         }
     }
 }
-
 
 struct MockStorageClient: StorageClient {
 
@@ -199,4 +198,3 @@ struct MockStorageClient: StorageClient {
         return values
     }
 }
-

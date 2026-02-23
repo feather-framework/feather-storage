@@ -9,7 +9,6 @@ import Testing
 
 @testable import FeatherStorage
 
-
 @Suite
 struct FeatherStorageTestSuite {
 
@@ -76,5 +75,3 @@ struct FeatherStorageTestSuite {
     }
 
 }
-
-

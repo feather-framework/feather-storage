@@ -5,7 +5,6 @@
 //  Created by Tibor Bödecs on 2026. 02. 23..
 //
 
-
 actor MockStorageState {
     var objects: [String: [Int]] = [:]
     var multiparts: [String: [Int: [Int]]] = [:]
