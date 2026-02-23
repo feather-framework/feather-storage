@@ -31,11 +31,11 @@ let package = Package(
         .visionOS(.v2),
     ],
     products: [
-        .library(name: "FeatherStorage", targets: ["FeatherStorage"]),
-        // [docc-plugin-placeholder]
+        .library(name: "FeatherStorage", targets: ["FeatherStorage"]),    
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.9.0"),
+        // [docc-plugin-placeholder]
     ],
     targets: [
         .target(
