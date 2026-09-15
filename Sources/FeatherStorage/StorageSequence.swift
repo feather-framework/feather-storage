@@ -73,7 +73,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
         }
     }
 
-    private let base: any AsyncSequence<ByteBuffer, any Error> & Sendable
+    private let makeIterator: @Sendable () -> AsyncIterator
 
     /// Optional known byte length of the sequence.
     public let length: UInt64?
@@ -88,7 +88,12 @@ public struct StorageSequence: Sendable, AsyncSequence {
         length: UInt64? = nil
     ) where S.Element == ByteBuffer {
         self.length = length
-        self.base = ErrorErasingSequence(base: asyncSequence)
+        self.makeIterator = {
+            AsyncIterator(
+                base: ErrorErasingSequence(base: asyncSequence)
+                    .makeAsyncIterator()
+            )
+        }
     }
 
     /// Creates a type-erased storage sequence from a byte buffer.
@@ -113,6 +118,6 @@ public struct StorageSequence: Sendable, AsyncSequence {
     ///
     /// - Returns: A new `AsyncIterator` instance.
     public func makeAsyncIterator() -> AsyncIterator {
-        AsyncIterator(base: base.makeAsyncIterator())
+        makeIterator()
     }
 }
