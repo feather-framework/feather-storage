@@ -16,6 +16,41 @@ struct StorageSequenceTestSuite {
         case failed
     }
 
+    private actor DemandProbe {
+        private(set) var requestCount = 0
+
+        func recordRequest() {
+            requestCount += 1
+        }
+    }
+
+    private struct DemandTrackingSequence: AsyncSequence, Sendable {
+        typealias Element = ByteBuffer
+
+        struct AsyncIterator: AsyncIteratorProtocol {
+            let probe: DemandProbe
+            var remainingCount: Int
+
+            mutating func next(
+                isolation actor: isolated (any Actor)?
+            ) async -> ByteBuffer? {
+                guard remainingCount > 0 else {
+                    return nil
+                }
+                remainingCount -= 1
+                await probe.recordRequest()
+                return ByteBuffer(bytes: [UInt8(remainingCount)])
+            }
+        }
+
+        let probe: DemandProbe
+        let count: Int
+
+        func makeAsyncIterator() -> AsyncIterator {
+            .init(probe: probe, remainingCount: count)
+        }
+    }
+
     @Test
     func initFromAsyncSequencePreservesElementsAndLength() async throws {
         let allocator = ByteBufferAllocator()
@@ -91,6 +126,29 @@ struct StorageSequenceTestSuite {
         catch {
             Issue.record("Unexpected error: \(error)")
         }
+    }
+
+    @Test
+    func requestsUpstreamElementsOnlyWhenConsumerAdvances() async throws {
+        let probe = DemandProbe()
+        let sequence = StorageSequence(
+            asyncSequence: DemandTrackingSequence(probe: probe, count: 3)
+        )
+        var iterator = sequence.makeAsyncIterator()
+
+        #expect(await probe.requestCount == 0)
+
+        _ = try await iterator.next()
+        for _ in 0..<10 {
+            await Task.yield()
+        }
+        #expect(await probe.requestCount == 1)
+
+        _ = try await iterator.next()
+        for _ in 0..<10 {
+            await Task.yield()
+        }
+        #expect(await probe.requestCount == 2)
     }
 
     private static func makeBuffer(
