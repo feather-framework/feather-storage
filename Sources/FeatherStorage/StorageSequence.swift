@@ -8,13 +8,13 @@ import NIOCore
 
 /// A type-erased async sequence of storage byte buffers.
 public struct StorageSequence: Sendable, AsyncSequence {
-    typealias BaseAsyncSequence = AsyncStream<Result<ByteBuffer, any Error>>
-
     /// An async iterator over a `StorageSequence`.
     public struct AsyncIterator: AsyncIteratorProtocol {
-        private var base: BaseAsyncSequence.AsyncIterator
+        private var base: any AsyncIteratorProtocol<ByteBuffer, any Error>
 
-        init(base: BaseAsyncSequence.AsyncIterator) {
+        init(
+            base: any AsyncIteratorProtocol<ByteBuffer, any Error>
+        ) {
             self.base = base
         }
 
@@ -25,7 +25,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
         /// - Throws: Any error emitted by the underlying async sequence.
         @concurrent
         public mutating func next() async throws -> ByteBuffer? {
-            try await self.base.next(isolation: nil)?.get()
+            try await base.next(isolation: nil)
         }
         #else
         /// Returns the next available byte buffer from the sequence.
@@ -33,7 +33,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
         /// - Returns: The next `ByteBuffer`, or `nil` when the sequence is finished.
         /// - Throws: Any error emitted by the underlying async sequence.
         public mutating func next() async throws -> ByteBuffer? {
-            try await self.base.next()?.get()
+            try await base.next()
         }
         #endif
 
@@ -45,11 +45,35 @@ public struct StorageSequence: Sendable, AsyncSequence {
         public mutating func next(
             isolation actor: isolated (any Actor)?
         ) async throws -> Element? {
-            try await self.base.next(isolation: actor)?.get()
+            try await base.next(isolation: actor)
         }
     }
 
-    private let makeIteratorCallback: @Sendable () -> BaseAsyncSequence
+    private struct FailureErasingAsyncSequence<Base: AsyncSequence & Sendable>:
+        AsyncSequence,
+        Sendable
+    where Base.Element == ByteBuffer {
+        typealias Element = ByteBuffer
+        typealias Failure = any Error
+
+        struct AsyncIterator: AsyncIteratorProtocol {
+            var base: Base.AsyncIterator
+
+            mutating func next(
+                isolation actor: isolated (any Actor)?
+            ) async throws(any Error) -> ByteBuffer? {
+                try await base.next(isolation: actor)
+            }
+        }
+
+        let base: Base
+
+        func makeAsyncIterator() -> AsyncIterator {
+            .init(base: base.makeAsyncIterator())
+        }
+    }
+
+    private let makeIterator: @Sendable () -> AsyncIterator
 
     /// Optional known byte length of the sequence.
     public let length: UInt64?
@@ -64,23 +88,11 @@ public struct StorageSequence: Sendable, AsyncSequence {
         length: UInt64? = nil
     ) where S.Element == ByteBuffer {
         self.length = length
-        self.makeIteratorCallback = {
-            BaseAsyncSequence { continuation in
-                let task = Task {
-                    do {
-                        for try await element in asyncSequence {
-                            continuation.yield(.success(element))
-                        }
-                    }
-                    catch {
-                        continuation.yield(.failure(error))
-                    }
-                    continuation.finish()
-                }
-                continuation.onTermination = { _ in
-                    task.cancel()
-                }
-            }
+        self.makeIterator = {
+            AsyncIterator(
+                base: FailureErasingAsyncSequence(base: asyncSequence)
+                    .makeAsyncIterator()
+            )
         }
     }
 
@@ -106,6 +118,6 @@ public struct StorageSequence: Sendable, AsyncSequence {
     ///
     /// - Returns: A new `AsyncIterator` instance.
     public func makeAsyncIterator() -> AsyncIterator {
-        AsyncIterator(base: makeIteratorCallback().makeAsyncIterator())
+        makeIterator()
     }
 }
