@@ -49,7 +49,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
         }
     }
 
-    private struct ErrorErasingSequence<Base: AsyncSequence & Sendable>:
+    private struct FailureErasingAsyncSequence<Base: AsyncSequence & Sendable>:
         AsyncSequence,
         Sendable
     where Base.Element == ByteBuffer {
@@ -90,7 +90,7 @@ public struct StorageSequence: Sendable, AsyncSequence {
         self.length = length
         self.makeIterator = {
             AsyncIterator(
-                base: ErrorErasingSequence(base: asyncSequence)
+                base: FailureErasingAsyncSequence(base: asyncSequence)
                     .makeAsyncIterator()
             )
         }
