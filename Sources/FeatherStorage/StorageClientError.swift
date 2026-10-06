@@ -16,5 +16,5 @@ public enum StorageClientError: Error {
     /// A multipart chunk descriptor is invalid.
     case invalidMultipartChunk
     /// Driver-specific underlying failure.
-    case unknown(Error)
+    case unknown(any Error)
 }

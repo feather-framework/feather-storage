@@ -40,9 +40,18 @@ struct MockStorageClient: StorageClient {
 
     func setObject(
         key: String,
-        values: [Int]
+        values: [Int],
+        contentType: String? = nil
     ) async {
-        await state.setObject(key, values: values)
+        await state.setObject(
+            key,
+            values: values,
+            contentType: contentType
+        )
+    }
+
+    func contentType(for key: String) async -> String? {
+        await state.objectContentType(for: key)
     }
 
     func multipartExists(
@@ -53,7 +62,8 @@ struct MockStorageClient: StorageClient {
 
     func upload(
         key: String,
-        sequence: StorageSequence
+        sequence: StorageSequence,
+        contentType: String?
     ) async throws(StorageClientError) {
         let values: [Int]
         do {
@@ -62,7 +72,11 @@ struct MockStorageClient: StorageClient {
         catch {
             throw .unknown(error)
         }
-        await state.setObject(key, values: values)
+        await state.setObject(
+            key,
+            values: values,
+            contentType: contentType
+        )
     }
 
     func download(
@@ -104,7 +118,11 @@ struct MockStorageClient: StorageClient {
         guard let values = await state.object(for: source) else {
             throw .invalidKey
         }
-        await state.setObject(destination, values: values)
+        await state.setObject(
+            destination,
+            values: values,
+            contentType: await state.objectContentType(for: source)
+        )
     }
 
     func list(

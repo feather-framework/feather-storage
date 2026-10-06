@@ -107,7 +107,7 @@ struct StorageSequenceTestSuite {
     func initFromThrowingSequencePropagatesErrors() async {
         let allocator = ByteBufferAllocator()
         let sequence = StorageSequence(
-            asyncSequence: AsyncThrowingStream<ByteBuffer, Error> {
+            asyncSequence: AsyncThrowingStream<ByteBuffer, any Error> {
                 continuation in
                 continuation.yield(Self.makeBuffer([1], allocator: allocator))
                 continuation.finish(throwing: TestError.failed)

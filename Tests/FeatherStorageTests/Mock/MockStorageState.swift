@@ -7,10 +7,21 @@
 
 actor MockStorageState {
     var objects: [String: [Int]] = [:]
+    var objectContentTypes: [String: String] = [:]
     var multiparts: [String: [Int: [Int]]] = [:]
 
-    func setObject(_ key: String, values: [Int]) {
+    func setObject(
+        _ key: String,
+        values: [Int],
+        contentType: String? = nil
+    ) {
         objects[key] = values
+        if let contentType {
+            objectContentTypes[key] = contentType
+        }
+        else {
+            objectContentTypes.removeValue(forKey: key)
+        }
     }
 
     func object(for key: String) -> [Int]? {
@@ -25,8 +36,13 @@ actor MockStorageState {
         objects[key]?.count ?? 0
     }
 
+    func objectContentType(for key: String) -> String? {
+        objectContentTypes[key]
+    }
+
     func deleteObject(_ key: String) {
         objects.removeValue(forKey: key)
+        objectContentTypes.removeValue(forKey: key)
     }
 
     func listKeys(prefix: String) -> [String] {
