@@ -4,7 +4,7 @@
 //
 //  Created by Tibor Bödecs on 2023. 01. 16.
 
-import NIOCore
+public import NIOCore
 
 /// An async sequence that streams a `ByteBuffer` in fixed-size chunks.
 public struct ByteBufferSequence: AsyncSequence, Sendable {

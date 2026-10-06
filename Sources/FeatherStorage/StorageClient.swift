@@ -12,10 +12,12 @@ public protocol StorageClient: Sendable {
     /// - Parameters:
     ///   - key: The destination object key.
     ///   - sequence: The source byte stream to upload.
+    ///   - contentType: Optional MIME type stored with the object metadata.
     /// - Throws: `StorageClientError` if the upload fails.
     func upload(
         key: String,
-        sequence: StorageSequence
+        sequence: StorageSequence,
+        contentType: String?
     ) async throws(StorageClientError)
 
     /// Downloads an object as an asynchronous byte stream.
@@ -135,6 +137,21 @@ public protocol StorageClient: Sendable {
 }
 
 extension StorageClient {
+
+    /// Uploads an object without additional metadata.
+    ///
+    /// This convenience preserves the original storage API for callers that
+    /// do not need to provide object metadata.
+    public func upload(
+        key: String,
+        sequence: StorageSequence
+    ) async throws(StorageClientError) {
+        try await upload(
+            key: key,
+            sequence: sequence,
+            contentType: nil
+        )
+    }
 
     /// Moves an object from one key to another by copying then deleting the source.
     ///

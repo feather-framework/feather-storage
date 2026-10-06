@@ -13,6 +13,23 @@ import Testing
 struct FeatherStorageTestSuite {
 
     @Test
+    func storageClientUploadPreservesContentType() async throws {
+        let client = MockStorageClient()
+        let sequence = StorageSequence(
+            asyncSequence: [1, 2, 3].byteBufferAsync,
+            length: 3
+        )
+
+        try await client.upload(
+            key: "image.webp",
+            sequence: sequence,
+            contentType: "image/webp"
+        )
+
+        #expect(await client.contentType(for: "image.webp") == "image/webp")
+    }
+
+    @Test
     func storageClientMoveDeletesSourceOnSuccess() async throws {
         let client = MockStorageClient()
         await client.setObject(key: "source", values: [1, 2, 3])

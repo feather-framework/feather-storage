@@ -4,7 +4,7 @@
 //
 //  Created by Tibor Bodecs on 2023. 01. 16.
 
-import NIOCore
+public import NIOCore
 
 /// A type-erased async sequence of storage byte buffers.
 public struct StorageSequence: Sendable, AsyncSequence {
