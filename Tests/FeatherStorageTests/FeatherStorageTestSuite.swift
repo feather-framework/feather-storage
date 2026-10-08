@@ -58,9 +58,13 @@ struct FeatherStorageTestSuite {
 
     @Test
     func storageClientMultipartAliasesRouteToUnderlyingMethods() async throws {
-        let client: any StorageClient = MockStorageClient()
+        let mockClient = MockStorageClient()
+        let client: any StorageClient = mockClient
 
-        let uploadId = try await client.createMultipartId(key: "file")
+        let uploadId = try await client.createMultipartId(
+            key: "file",
+            contentType: "application/pdf"
+        )
         #expect(uploadId == "mp-file")
 
         let partSequence = StorageSequence(
@@ -85,6 +89,7 @@ struct FeatherStorageTestSuite {
 
         #expect(try await client.exists(key: "file") == true)
         #expect(try await client.size(key: "file") == 3)
+        #expect(await mockClient.contentType(for: "file") == "application/pdf")
 
         let uploadId2 = try await client.createMultipartId(key: "tmp")
         try await client.abort(multipartId: uploadId2, key: "file")

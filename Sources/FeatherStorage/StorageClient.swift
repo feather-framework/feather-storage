@@ -88,11 +88,14 @@ public protocol StorageClient: Sendable {
 
     /// Starts a multipart upload session.
     ///
-    /// - Parameter key: The destination object key for the multipart upload.
+    /// - Parameters:
+    ///   - key: The destination object key for the multipart upload.
+    ///   - contentType: Optional MIME type stored with the completed object.
     /// - Returns: The multipart upload identifier.
     /// - Throws: `StorageClientError` if the session cannot be created.
     func createMultipartId(
-        key: String
+        key: String,
+        contentType: String?
     ) async throws(StorageClientError) -> String
 
     /// Uploads a single multipart chunk from an asynchronous byte stream.
@@ -137,6 +140,16 @@ public protocol StorageClient: Sendable {
 }
 
 extension StorageClient {
+
+    /// Starts a multipart upload without additional object metadata.
+    public func createMultipartId(
+        key: String
+    ) async throws(StorageClientError) -> String {
+        try await createMultipartId(
+            key: key,
+            contentType: nil
+        )
+    }
 
     /// Uploads an object without additional metadata.
     ///
