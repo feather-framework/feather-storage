@@ -145,10 +145,11 @@ struct MockStorageClient: StorageClient {
     }
 
     func createMultipartId(
-        key: String
+        key: String,
+        contentType: String?
     ) async throws(StorageClientError) -> String {
         let id = "mp-\(key)"
-        await state.createMultipart(id: id)
+        await state.createMultipart(id: id, contentType: contentType)
         return id
     }
 
@@ -198,7 +199,12 @@ struct MockStorageClient: StorageClient {
             }
             output.append(contentsOf: values)
         }
-        await state.setObject(key, values: output)
+        let contentType = await state.multipartContentType(multipartId)
+        await state.setObject(
+            key,
+            values: output,
+            contentType: contentType
+        )
         await state.removeMultipart(multipartId)
     }
 

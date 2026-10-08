@@ -9,6 +9,7 @@ actor MockStorageState {
     var objects: [String: [Int]] = [:]
     var objectContentTypes: [String: String] = [:]
     var multiparts: [String: [Int: [Int]]] = [:]
+    var multipartContentTypes: [String: String] = [:]
 
     func setObject(
         _ key: String,
@@ -49,8 +50,11 @@ actor MockStorageState {
         objects.keys.filter { $0.hasPrefix(prefix) }.sorted()
     }
 
-    func createMultipart(id: String) {
+    func createMultipart(id: String, contentType: String?) {
         multiparts[id] = [:]
+        if let contentType {
+            multipartContentTypes[id] = contentType
+        }
     }
 
     func hasMultipart(_ id: String) -> Bool {
@@ -65,7 +69,12 @@ actor MockStorageState {
         multiparts[id]
     }
 
+    func multipartContentType(_ id: String) -> String? {
+        multipartContentTypes[id]
+    }
+
     func removeMultipart(_ id: String) {
         multiparts.removeValue(forKey: id)
+        multipartContentTypes.removeValue(forKey: id)
     }
 }
