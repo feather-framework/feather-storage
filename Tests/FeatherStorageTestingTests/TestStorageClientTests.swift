@@ -16,15 +16,23 @@ struct TestStorageClientTests {
             contentType: "text/plain"
         )
 
-        #expect(await state.objectBytes(for: "docs/hello.txt") == [1, 2, 3, 4, 5])
+        #expect(
+            await state.objectBytes(for: "docs/hello.txt") == [1, 2, 3, 4, 5]
+        )
         #expect(await state.objectSize("docs/hello.txt") == 5)
         #expect(await state.contentType(for: "docs/hello.txt") == "text/plain")
         #expect(await state.objectExists("docs/hello.txt"))
 
-        let fullDownload = try await client.download(key: "docs/hello.txt", range: nil)
+        let fullDownload = try await client.download(
+            key: "docs/hello.txt",
+            range: nil
+        )
         #expect(try await collect(fullDownload) == [1, 2, 3, 4, 5])
 
-        let rangedDownload = try await client.download(key: "docs/hello.txt", range: 1...3)
+        let rangedDownload = try await client.download(
+            key: "docs/hello.txt",
+            range: 1...3
+        )
         #expect(try await collect(rangedDownload) == [2, 3, 4])
     }
 
@@ -50,7 +58,9 @@ struct TestStorageClientTests {
 
         do {
             _ = try await client.download(key: "short.txt", range: 0...3)
-            Issue.record("Expected an out-of-bounds range to throw invalidBuffer.")
+            Issue.record(
+                "Expected an out-of-bounds range to throw invalidBuffer."
+            )
         }
         catch StorageClientError.invalidBuffer {
             // Expected invalid range.
@@ -66,7 +76,10 @@ struct TestStorageClientTests {
         let client = TestStorageClient(state: state)
 
         try await client.create(key: "docs/nested")
-        try await client.upload(key: "docs/nested/a.txt", sequence: sequence([1]))
+        try await client.upload(
+            key: "docs/nested/a.txt",
+            sequence: sequence([1])
+        )
         try await client.upload(key: "docs/b.txt", sequence: sequence([2]))
 
         #expect(try await client.list(key: "docs") == ["b.txt", "nested"])
@@ -109,7 +122,10 @@ struct TestStorageClientTests {
         )
 
         #expect(await state.objectBytes(for: "bundle.bin") == [1, 2, 3, 4])
-        #expect(await state.contentType(for: "bundle.bin") == "application/octet-stream")
+        #expect(
+            await state.contentType(for: "bundle.bin")
+                == "application/octet-stream"
+        )
         #expect(await state.multipartUploadIDs().isEmpty)
 
         let abortedId = try await client.createMultipartId(key: "aborted.bin")

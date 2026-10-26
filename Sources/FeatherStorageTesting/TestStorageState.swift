@@ -121,15 +121,17 @@ public actor TestStorageState {
 
     func listEntries(prefix: String?) -> [String] {
         let normalizedPrefix = prefix.map(Self.normalizeDirectoryKey)
-        let rootPrefix = normalizedPrefix.map {
-            $0.isEmpty ? "" : $0 + "/"
-        } ?? ""
+        let rootPrefix =
+            normalizedPrefix.map {
+                $0.isEmpty ? "" : $0 + "/"
+            } ?? ""
         var entries: Set<String> = []
 
         for objectKey in objects.keys where objectKey.hasPrefix(rootPrefix) {
             let remainder = String(objectKey.dropFirst(rootPrefix.count))
             guard !remainder.isEmpty else { continue }
-            if let component = remainder
+            if let component =
+                remainder
                 .split(separator: "/", maxSplits: 1)
                 .first
             {
@@ -140,7 +142,8 @@ public actor TestStorageState {
         for directory in directories where directory.hasPrefix(rootPrefix) {
             let remainder = String(directory.dropFirst(rootPrefix.count))
             guard !remainder.isEmpty else { continue }
-            if let component = remainder
+            if let component =
+                remainder
                 .split(separator: "/", maxSplits: 1)
                 .first
             {
@@ -207,7 +210,8 @@ public actor TestStorageState {
 
         var result = ByteBufferAllocator().buffer(capacity: 0)
         for chunk in chunks.sorted(by: { $0.number < $1.number }) {
-            guard let part = upload.parts[chunk.number], part.chunkId == chunk.id
+            guard let part = upload.parts[chunk.number],
+                part.chunkId == chunk.id
             else {
                 throw .invalidMultipartChunk
             }

@@ -97,7 +97,9 @@ struct FeatherStorageTestSuite {
 
         #expect(try await client.exists(key: "file") == true)
         #expect(try await client.size(key: "file") == 3)
-        #expect(await testClient.state.contentType(for: "file") == "application/pdf")
+        #expect(
+            await testClient.state.contentType(for: "file") == "application/pdf"
+        )
         #expect(await testClient.state.objectBytes(for: "file") == [7, 8, 9])
         #expect(await testClient.state.hasMultipartUpload(uploadId) == false)
 

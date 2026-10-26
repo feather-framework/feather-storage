@@ -80,7 +80,8 @@ public struct TestStorageClient: StorageClient {
         try await state.copyObject(source: source, destination: destination)
     }
 
-    public func list(key: String?) async throws(StorageClientError) -> [String] {
+    public func list(key: String?) async throws(StorageClientError) -> [String]
+    {
         await state.listEntries(prefix: key)
     }
 
