@@ -3,9 +3,9 @@
 Abstract storage component, providing a shared API surface for file storage drivers written in Swift.
 
 [
-    ![Release: 1.0.0-rc.2](https://img.shields.io/badge/Release-1%2E0%2E0--rc%2E2-F05138)
+    ![Release: 1.0.0-rc.3](https://img.shields.io/badge/Release-1%2E0%2E0--rc%2E3-F05138)
 ](
-    https://github.com/feather-framework/feather-storage/releases/tag/1.0.0-rc.2
+    https://github.com/feather-framework/feather-storage/releases/tag/1.0.0-rc.3
 )
 
 ## Features
@@ -35,7 +35,7 @@ Abstract storage component, providing a shared API surface for file storage driv
 Use Swift Package Manager; add the dependency to your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/feather-framework/feather-storage", exact: "1.0.0-rc.2"),
+.package(url: "https://github.com/feather-framework/feather-storage", exact: "1.0.0-rc.3"),
 ```
 
 Then add `FeatherStorage` to your target dependencies:
@@ -43,6 +43,15 @@ Then add `FeatherStorage` to your target dependencies:
 ```swift
 .product(name: "FeatherStorage", package: "feather-storage"),
 ```
+
+For in-memory test support, add `FeatherStorageTesting`:
+
+```swift
+.product(name: "FeatherStorageTesting", package: "feather-storage"),
+```
+
+`TestStorageClient` implements the storage API in memory and exposes recorded
+content types and multipart upload state for assertions.
 
 ## Usage
 
@@ -52,7 +61,8 @@ Then add `FeatherStorage` to your target dependencies:
     https://feather-framework.github.io/feather-storage/
 )
 
-API documentation is available at the following link. Refer to the mock objects in the Tests directory if you want to build a custom storage driver implementation.
+API documentation is available at the following link. Use `FeatherStorageTesting`
+for an in-memory client in consuming test targets.
 
 > [!WARNING]  
 > This repository is a work in progress, things can break until it reaches v1.0.0.
@@ -63,7 +73,9 @@ The following storage driver implementations are available for use:
 
 - [FS](https://github.com/feather-framework/feather-storage-fs)
 - [S3](https://github.com/feather-framework/feather-storage-s3)
-- [Ephemeral](https://github.com/feather-framework/feather-storage-ephemeral)
+
+In-memory test support is provided by `FeatherStorageTesting` in this package;
+it is not a production storage driver.
 
 ## Development
 

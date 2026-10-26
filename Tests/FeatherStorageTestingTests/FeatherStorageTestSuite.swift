@@ -4,6 +4,7 @@
 //
 //  Created by Tibor Bodecs on 2023. 01. 16.
 
+import FeatherStorageTesting
 import NIOCore
 import Testing
 
@@ -14,7 +15,8 @@ struct FeatherStorageTestSuite {
 
     @Test
     func storageClientUploadPreservesContentType() async throws {
-        let client = MockStorageClient()
+        let state = TestStorageState()
+        let client = TestStorageClient(state: state)
         let sequence = StorageSequence(
             asyncSequence: [1, 2, 3].byteBufferAsync,
             length: 3
@@ -26,13 +28,18 @@ struct FeatherStorageTestSuite {
             contentType: "image/webp"
         )
 
-        #expect(await client.contentType(for: "image.webp") == "image/webp")
+        #expect(await state.contentType(for: "image.webp") == "image/webp")
+        #expect(await state.objectBytes(for: "image.webp") == [1, 2, 3])
+        #expect(await state.objectExists("image.webp"))
     }
 
     @Test
     func storageClientMoveDeletesSourceOnSuccess() async throws {
-        let client = MockStorageClient()
-        await client.setObject(key: "source", values: [1, 2, 3])
+        let client = TestStorageClient()
+        try await client.upload(
+            key: "source",
+            sequence: StorageSequence(buffer: ByteBuffer(bytes: [1, 2, 3]))
+        )
 
         try await client.move(key: "source", to: "dest")
 
@@ -43,7 +50,7 @@ struct FeatherStorageTestSuite {
 
     @Test
     func storageClientMoveThrowsForMissingSource() async {
-        let client = MockStorageClient()
+        let client = TestStorageClient()
         do {
             try await client.move(key: "missing", to: "dest")
             Issue.record("Expected invalidKey")
@@ -58,14 +65,15 @@ struct FeatherStorageTestSuite {
 
     @Test
     func storageClientMultipartAliasesRouteToUnderlyingMethods() async throws {
-        let mockClient = MockStorageClient()
-        let client: any StorageClient = mockClient
+        let testClient = TestStorageClient()
+        let client: any StorageClient = testClient
 
         let uploadId = try await client.createMultipartId(
             key: "file",
             contentType: "application/pdf"
         )
-        #expect(uploadId == "mp-file")
+        #expect(!uploadId.isEmpty)
+        #expect(await testClient.state.hasMultipartUpload(uploadId))
 
         let partSequence = StorageSequence(
             asyncSequence: [7, 8, 9].byteBufferAsync,
@@ -78,7 +86,7 @@ struct FeatherStorageTestSuite {
             sequence: partSequence
         )
 
-        #expect(part.id == "file-1")
+        #expect(!part.id.isEmpty)
         #expect(part.number == 1)
 
         try await client.finish(
@@ -89,10 +97,13 @@ struct FeatherStorageTestSuite {
 
         #expect(try await client.exists(key: "file") == true)
         #expect(try await client.size(key: "file") == 3)
-        #expect(await mockClient.contentType(for: "file") == "application/pdf")
+        #expect(await testClient.state.contentType(for: "file") == "application/pdf")
+        #expect(await testClient.state.objectBytes(for: "file") == [7, 8, 9])
+        #expect(await testClient.state.hasMultipartUpload(uploadId) == false)
 
         let uploadId2 = try await client.createMultipartId(key: "tmp")
-        try await client.abort(multipartId: uploadId2, key: "file")
+        try await client.abort(multipartId: uploadId2, key: "tmp")
+        #expect(await testClient.state.hasMultipartUpload(uploadId2) == false)
 
     }
 
