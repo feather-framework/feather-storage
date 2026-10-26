@@ -28,6 +28,7 @@ let package = Package(
     ],
     products: [
         .library(name: "FeatherStorage", targets: ["FeatherStorage"]),    
+        .library(name: "FeatherStorageTesting", targets: ["FeatherStorageTesting"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio", from: "2.100.0"),
@@ -40,11 +41,29 @@ let package = Package(
             ],
             swiftSettings: swiftSettings
         ),
+        .target(
+            name: "FeatherStorageTesting",
+            dependencies: [
+                .target(name: "FeatherStorage"),
+                .product(name: "NIOCore", package: "swift-nio"),
+            ],
+            path: "Sources/FeatherStorageTesting",
+            swiftSettings: swiftSettings
+        ),
         .testTarget(
             name: "FeatherStorageTests",
             dependencies: [
                 .target(name: "FeatherStorage"),
                 .product(name: "NIOFoundationCompat", package: "swift-nio"),
+            ],
+            swiftSettings: swiftSettings
+        ),
+        .testTarget(
+            name: "FeatherStorageTestingTests",
+            dependencies: [
+                .target(name: "FeatherStorage"),
+                .target(name: "FeatherStorageTesting"),
+                .product(name: "NIOCore", package: "swift-nio"),
             ],
             swiftSettings: swiftSettings
         ),
